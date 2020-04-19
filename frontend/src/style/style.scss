@@ -1,0 +1,98 @@
+.App {
+  text-align: center;
+}
+
+input[type=text] {
+  width: 200px;
+  padding: 12px;
+  height: 20px;
+  line-height: 20px;
+  font-size: 15px;
+}
+
+.todoBox {
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  .todoInputBox {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    label {
+      margin-bottom: 5px;
+      > span {
+        display: inline-block;
+        width: 100px;
+      }
+    }
+    .todoList {
+
+    }
+    p {
+      margin: 5px 0px;
+      font-size: 12px;
+    }
+    .submitBtn {
+      width: 200px;
+      padding: 14px;
+      margin: 10px;
+      background-color: blue;
+      color:#fff
+    }
+  }
+  .todoListBox {
+    margin-top:20px;
+    padding: 0px 50px;
+    .todoCheckBox {
+      .todoId {
+        margin: 0px 5px;
+      }
+    }
+    .todoItem {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      margin-bottom: 5px;
+      border: 1px solid #ddd;
+      .todoTextBox {
+        > span {
+          margin: 0 5px;
+        }
+        .todoText {
+          flex:1;
+        }
+      }
+      .btnBox {
+        width: 80px;
+        > span {
+          margin: 0 5px;
+          cursor: pointer;
+        }
+        .deleteBtn {
+          color:red;
+        }
+        .editBtn {
+          color:blue;
+        }
+      }
+    }
+  }
+
+  // input:checked {
+  //   &~ .todoTextBox .todoText {
+  //     text-decoration: line-through;
+  //   }
+  //   &~ .btnBox {
+  //     .editBtn {
+  //       display: none;
+  //     }
+  //   }
+  // }
+}
+
+
+
+
