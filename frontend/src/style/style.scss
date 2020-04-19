@@ -10,6 +10,11 @@ input[type=text] {
   font-size: 15px;
 }
 
+ul {
+  list-style: none;
+  padding:0;
+}
+
 .todoBox {
   display: flex;
   flex-direction: column;
@@ -30,6 +35,13 @@ input[type=text] {
     .todoList {
 
     }
+    .todoTag {
+      display: flex;
+      align-items: center;
+      select {
+        width: 226px;
+      }
+    }
     p {
       margin: 5px 0px;
       font-size: 12px;
@@ -43,6 +55,7 @@ input[type=text] {
     }
   }
   .todoListBox {
+    height: 520px;
     margin-top:20px;
     padding: 0px 50px;
     .todoCheckBox {
@@ -58,11 +71,12 @@ input[type=text] {
       margin-bottom: 5px;
       border: 1px solid #ddd;
       .todoTextBox {
-        > span {
-          margin: 0 5px;
-        }
-        .todoText {
-          flex:1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 77px;
+        > div {
+          margin: 5px;
         }
       }
       .btnBox {
@@ -91,6 +105,22 @@ input[type=text] {
   //     }
   //   }
   // }
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px auto;
+    li {
+      padding: 5px 10px;
+      margin: 0px 5px;
+      border-radius: 10px;
+      cursor: pointer;
+      &.active {
+        background-color: blue;
+        color: #fff;
+      }
+    }
+  }
 }
 
 

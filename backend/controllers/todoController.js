@@ -32,7 +32,7 @@ router.get('/todoList', async (req, res) => {
 */
 router.post('/todoList', async (req, res) => {
   const { todo = [], page = 1 } = req.body
-  await insertTodoList({ todo }).then(async (data) => {
+  await insertTodoList({ todo }).then(async () => {
     await selectTodoList({ page }).then((data) => {
       const totalPage = data[0].totalPage
       const result = data.map(v => {
@@ -44,7 +44,7 @@ router.post('/todoList', async (req, res) => {
       });
 
       res.send({
-        totalPage: Math.round(totalPage / 5),
+        totalPage: Math.ceil(totalPage / 5),
         list: result
       })
     }).catch((err) => {
@@ -62,7 +62,7 @@ router.delete('/todoList', async (req, res) => {
   const { todoId, page } = req.query;
   await deleteTodoList({ todoId }).then(async (data) => {
     await selectTodoList({ page }).then((data) => {
-      const totalPage = data[0].totalPage
+      const totalPage = (data.length > 0) ? data[0].totalPage : 0
       const result = data.map(v => {
         delete v.totalPage
         return {
@@ -72,7 +72,7 @@ router.delete('/todoList', async (req, res) => {
       });
 
       res.send({
-        totalPage: Math.round(totalPage / 5),
+        totalPage: Math.ceil(totalPage / 5),
         list: result
       })
     }).catch((err) => {
@@ -103,7 +103,7 @@ router.put('/todoList', async (req, res) => {
       });
 
       res.send({
-        totalPage: Math.round(totalPage / 5),
+        totalPage: Math.ceil(totalPage / 5),
         list: result
       })
     }).catch((err) => {
