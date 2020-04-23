@@ -64,6 +64,7 @@ ul {
       }
     }
     .todoItem {
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -92,19 +93,24 @@ ul {
           color:blue;
         }
       }
+      .complete {
+        position: absolute;
+        top:50%;
+        left:50%;
+        margin-top: -30px;
+        margin-left: -60px;
+        padding: 10px;
+        border: 8px solid blue;
+        color: blue;
+        background-color: #fff;
+        font-size: 20px;
+        font-weight: bold;
+
+
+      }
     }
   }
 
-  // input:checked {
-  //   &~ .todoTextBox .todoText {
-  //     text-decoration: line-through;
-  //   }
-  //   &~ .btnBox {
-  //     .editBtn {
-  //       display: none;
-  //     }
-  //   }
-  // }
   .pagination {
     display: flex;
     align-items: center;

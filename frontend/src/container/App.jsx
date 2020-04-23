@@ -10,6 +10,11 @@ function App() {
   const [todoList, setTodoList] = useState([])
   const [todo, setTodo] = useState('')
   const [tagList, setTagList] = useState([])
+  const [selectTagList, setSelectTagList] = useState([])
+
+  useEffect(() => {
+    getTagList()
+  }, [])
 
   useEffect(() => {
     getTodoList()
@@ -25,7 +30,7 @@ function App() {
 
   const getTodoList = () => {
     const params = { page: crruntPage }
-    axios.get(`http://localhost:5000/api/todoList`, { params })
+    axios.get(`http://localhost:5000/api/todo`, { params })
       .then((result) => {
         setTotalPage(result.data.totalPage)
         setTodoList(result.data.list)
@@ -36,8 +41,8 @@ function App() {
 
   const postTodoList = () => {
     if(todo) {
-      const data = { todo: todo, page: crruntPage, tagList:tagList.join(',') }
-      axios.post('http://localhost:5000/api/todoList', qs.stringify(data))
+      const data = { todo: todo, page: crruntPage, tag:selectTagList.join(',') }
+      axios.post('http://localhost:5000/api/todo', qs.stringify(data))
       .then((result) => {
         setTotalPage(result.data.totalPage)
         setTodoList(result.data.list)
@@ -52,8 +57,8 @@ function App() {
   const deleteTodoList = (todoId) => {
     const confirm = window.confirm("삭제하시겠습니까?");
     if (confirm) {
-      const params = { todoId, page: crruntPage }
-      axios.delete('http://localhost:5000/api/todoList', { params })
+      const params = { page: crruntPage }
+      axios.delete(`http://localhost:5000/api/todo/${todoId}`, { params })
         .then((result) => {
           setTotalPage(result.data.totalPage)
           setTodoList(result.data.list)
@@ -65,8 +70,8 @@ function App() {
 
   const editTodoList = (todo,todoId) => {
     if(todo){
-      const data = { todo, todoId, page: crruntPage }
-      axios.put('http://localhost:5000/api/todoList', qs.stringify(data))
+      const data = { todo, page: crruntPage }
+      axios.put(`http://localhost:5000/api/todo/${todoId}`, qs.stringify(data))
         .then((result) => {
           setTotalPage(result.data.totalPage)
           setTodoList(result.data.list)
@@ -74,6 +79,15 @@ function App() {
           console.log(e)
         })
     }
+  }
+
+  const getTagList = () => {
+    axios.get(`http://localhost:5000/api/todo/tag`)
+      .then((result) => {
+        setTagList(result.data.tagList)
+      }).catch((e) => {
+        console.log(e)
+      })
   }
 
   const selectTag = (e) => {
@@ -84,11 +98,12 @@ function App() {
         value.push(options[i].value);
       }
     }
-    setTagList(value)
+    setSelectTagList(value)
   }
+  
 
   const renderOption = ()=>{
-    const option = todoList.map((v,i)=>{
+    const option = tagList.map((v,i)=>{
       return (<option value={v.id} key={`tag-${v.id}`}>{`${v.id} | ${v.text}`}</option>)
     })
     return option
@@ -127,6 +142,7 @@ function App() {
           todoList={todoList}
           deleteTodoList={deleteTodoList}
           editTodoList={editTodoList}
+          tagList={tagList}
         />
         <ul className="pagination">
           {renderPagination()}

@@ -29,8 +29,8 @@ module.exports.selectTodoList = selectTodoList
 /** 
  * todo 추가
 */
-const insertTodoList = ({ todo }) => {
-  const query = `INSERT INTO todo (text) VALUES ('${todo}')`;
+const insertTodoList = ({ todo, tag }) => {
+  const query = `INSERT INTO todo (text , tag) VALUES ('${todo}','${tag}')`;
   return new Promise(function (resolve, reject) {
     db.all(query, (err, rows) => {
       if (err) {
@@ -79,4 +79,23 @@ const editTodoList = ({ todo, editDate, todoId }) => {
 };
 
 module.exports.editTodoList = editTodoList
+
+
+/** 
+ * 참조 리스트 조회
+*/
+const selectTagList = () => {
+  const query = `SELECT id, text, is_complete FROM todo ORDER BY id DESC`;
+  return new Promise(function (resolve, reject) {
+    db.all(query, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+};
+
+module.exports.selectTagList = selectTagList
 

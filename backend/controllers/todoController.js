@@ -1,14 +1,14 @@
 const express = require('express')
 const router = require('express').Router()
-const { selectTodoList, insertTodoList, deleteTodoList, editTodoList } = require('../models/todoModel')
+const { selectTodoList, insertTodoList, deleteTodoList, editTodoList, selectTagList } = require('../models/todoModel')
 
 /** 
  * todo 조회
 */
-router.get('/todoList', async (req, res) => {
+router.get('/todo', (req, res) => {
   const { page = 1 } = req.query
 
-  await selectTodoList({ page }).then((data) => {
+  selectTodoList({ page }).then((data) => {
     const totalPage = data[0].totalPage
     const result = data.map(v => {
       delete v.totalPage
@@ -30,10 +30,10 @@ router.get('/todoList', async (req, res) => {
 /** 
  * todo 추가
 */
-router.post('/todoList', async (req, res) => {
-  const { todo = [], page = 1 } = req.body
-  await insertTodoList({ todo }).then(async () => {
-    await selectTodoList({ page }).then((data) => {
+router.post('/todo', (req, res) => {
+  const { todo = [], tag = '', page = 1 } = req.body
+  insertTodoList({ todo, tag }).then(() => {
+    selectTodoList({ page }).then((data) => {
       const totalPage = data[0].totalPage
       const result = data.map(v => {
         delete v.totalPage
@@ -58,10 +58,11 @@ router.post('/todoList', async (req, res) => {
 /** 
  * todo 삭제
 */
-router.delete('/todoList', async (req, res) => {
-  const { todoId, page } = req.query;
-  await deleteTodoList({ todoId }).then(async (data) => {
-    await selectTodoList({ page }).then((data) => {
+router.delete('/todo/:todoId', (req, res) => {
+  const { page } = req.query;
+  const { todoId } = req.params;
+  deleteTodoList({ todoId }).then(() => {
+    selectTodoList({ page }).then((data) => {
       const totalPage = (data.length > 0) ? data[0].totalPage : 0
       const result = data.map(v => {
         delete v.totalPage
@@ -86,13 +87,15 @@ router.delete('/todoList', async (req, res) => {
 /** 
  * todo 수정
 */
-router.put('/todoList', async (req, res) => {
-  const { todo, todoId, page } = req.body
+router.put('/todo/:todoId', (req, res) => {
+  const { todo, page } = req.body;
+  const { todoId } = req.params;
   const date = new Date();
   const month = date.getMonth() + 1
   const editDate = `${date.getFullYear()}-${(month < 10 ? `0${month}` : month)}-${date.getDate()}`
-  await editTodoList({ todo, editDate, todoId }).then(async (data) => {
-    await selectTodoList({ page }).then((data) => {
+
+  editTodoList({ todo, editDate, todoId }).then((data) => {
+    selectTodoList({ page }).then((data) => {
       const totalPage = data[0].totalPage
       const result = data.map(v => {
         delete v.totalPage
@@ -114,5 +117,17 @@ router.put('/todoList', async (req, res) => {
   })
 })
 
+/** 
+ * 참조 리스트 조회
+*/
+router.get('/todo/tag', (req, res) => {
+  selectTagList().then((data) => {
+    res.send({
+      tagList: data
+    })
+  }).catch((err) => {
+    console.log(err)
+  })
+})
 
 module.exports = router;
