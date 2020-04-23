@@ -11,7 +11,7 @@ const db = new sqlite3.Database('./db/todoApp.db', sqlite3.OPEN_READWRITE, (err)
 /** 
  * todo 조회
 */
-const selectTodoList = ({ page }) => {
+const selectTodoList = (page) => {
   const query = [
     `SELECT (SELECT COUNT(*)  FROM todo) AS totalPage,`,
     `id, text, tag, create_date, edit_date,`,
@@ -23,7 +23,7 @@ const selectTodoList = ({ page }) => {
       END AS is_complete`,
     `FROM todo`,
     `ORDER BY id DESC`,
-    `LIMIT ${5 * (page - 1)},5`
+    (page) ? `LIMIT ${5 * (page - 1)},5` : null
   ].join(' ')
 
   return new Promise(function (resolve, reject) {

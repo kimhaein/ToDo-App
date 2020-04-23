@@ -41,7 +41,7 @@ function App() {
 
   const postTodoList = () => {
     if(todo) {
-      const data = { todo: todo, page: crruntPage, tag:selectTagList.join(',') }
+      const data = { todo, page: crruntPage, tag:selectTagList.join('-') }
       axios.post('http://localhost:5000/api/todo', qs.stringify(data))
       .then(() => {
         getTodoList()
@@ -118,7 +118,6 @@ function App() {
     return pagination
   }
 
-
   return (
     <div className="App">
       <h1>Todo-List</h1>
@@ -166,7 +165,7 @@ function App() {
           {renderPagination()}
         </ul>
       </div>
-      <div className="btn download" onClick={()=>{console.log('다운로드')}}>다운로드</div>
+      <a className="btn download" href="http://localhost:5000/api/todo/download" target="_blank">다운로드</a>
     </div>
   );
 }

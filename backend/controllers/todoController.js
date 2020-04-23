@@ -1,6 +1,13 @@
-const express = require('express')
 const router = require('express').Router()
-const { selectTodoList, insertTodoList, deleteTodoList, editTodoList, selectTagList, selectCompletedTodoList } = require('../models/todoModel')
+const {
+  selectTodoList,
+  insertTodoList,
+  deleteTodoList,
+  editTodoList,
+  selectTagList,
+  selectCompletedTodoList
+} = require('../models/todoModel')
+
 
 /** 
  * todo 조회
@@ -10,7 +17,7 @@ router.get('/todo', async (req, res) => {
 
   const [completedList, todoList] = await Promise.all([
     selectCompletedTodoList(),
-    selectTodoList({ page })
+    selectTodoList(page)
   ])
 
   const completedTags = completedList.map((v) => v.id)
@@ -18,7 +25,7 @@ router.get('/todo', async (req, res) => {
   const list = todoList.map((v) => {
     const tagList = []
     if (v.tag) {
-      v.tag = v.tag.split(',')
+      v.tag = v.tag.split('-')
       v.tag.forEach((tag) => {
         if (completedTags.includes(+tag)) {
           tagList.push(tag)
@@ -46,27 +53,12 @@ router.get('/todo', async (req, res) => {
 */
 router.post('/todo', (req, res) => {
   const { todo = [], tag = '', page = 1 } = req.body
-  insertTodoList({ todo, tag }).then(() => {
-    selectTodoList({ page }).then((data) => {
-      const totalPage = data[0].totalPage
-      const result = data.map(v => {
-        delete v.totalPage
-        return {
-          ...v,
-          create_date: v.create_date.slice(0, 10)
-        }
-      });
-
-      res.send({
-        totalPage: Math.ceil(totalPage / 5),
-        list: result
-      })
+  insertTodoList({ todo, tag })
+    .then(() => {
+      res.sendStatus(200)
     }).catch((err) => {
       console.log(err)
     })
-  }).catch((err) => {
-    console.log(err)
-  })
 })
 
 /** 
@@ -75,27 +67,12 @@ router.post('/todo', (req, res) => {
 router.delete('/todo/:todoId', (req, res) => {
   const { page } = req.query;
   const { todoId } = req.params;
-  deleteTodoList({ todoId }).then(() => {
-    selectTodoList({ page }).then((data) => {
-      const totalPage = (data.length > 0) ? data[0].totalPage : 0
-      const result = data.map(v => {
-        delete v.totalPage
-        return {
-          ...v,
-          create_date: v.create_date.slice(0, 10)
-        }
-      });
-
-      res.send({
-        totalPage: Math.ceil(totalPage / 5),
-        list: result
-      })
+  deleteTodoList({ todoId })
+    .then(() => {
+      res.sendStatus(200)
     }).catch((err) => {
       console.log(err)
     })
-  }).catch((err) => {
-    console.log(err)
-  })
 })
 
 /** 
@@ -115,7 +92,7 @@ router.put('/todo/:todoId', (req, res) => {
   data.is_complete = is_complete === 'Y' ? true : false
 
   editTodoList(todoId, data)
-    .then((data) => {
+    .then(() => {
       res.sendStatus(200)
     }).catch((err) => {
       console.log(err)
@@ -126,27 +103,36 @@ router.put('/todo/:todoId', (req, res) => {
  * 참조 리스트 조회
 */
 router.get('/todo/tag', (req, res) => {
-  selectTagList().then((data) => {
-    res.send({
-      tagList: data
+  selectTagList()
+    .then((data) => {
+      res.send({
+        tagList: data
+      })
+    }).catch((err) => {
+      console.log(err)
     })
-  }).catch((err) => {
-    console.log(err)
-  })
 })
 
-
 /** 
- * 리스트 완료 처리
+ * todo 다운로드
 */
-router.get('/todo/tag', (req, res) => {
-  selectTagList().then((data) => {
-    res.send({
-      tagList: data
+router.get('/todo/download', (req, res) => {
+  selectTodoList()
+    .then((data) => {
+      const csvArray = ['id, text, tag, create_date, edit_date, is_complete'];
+      data.map((v) => {
+        csvArray.push(`${v.id}, ${v.text}, ${v.tag}, ${v.create_date}, ${v.edit_date}, ${v.is_complete}`)
+      })
+
+      const buf = Buffer.from('\u{FEFF}' + csvArray.join('\n'), 'utf-8');
+      res.set('Content-Type', 'text/csv; charset=utf-8');
+      res.set('Content-disposition', `attachment; filename=todo.csv`);
+      res.set('Content-length', buf.length);
+      res.end(buf);
+
+    }).catch((err) => {
+      console.log(err)
     })
-  }).catch((err) => {
-    console.log(err)
-  })
 })
 
 module.exports = router;
