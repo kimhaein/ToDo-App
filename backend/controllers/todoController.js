@@ -1,29 +1,43 @@
 const express = require('express')
 const router = require('express').Router()
-const { selectTodoList, insertTodoList, deleteTodoList, editTodoList, selectTagList } = require('../models/todoModel')
+const { selectTodoList, insertTodoList, deleteTodoList, editTodoList, selectTagList, selectCompletedTodoList } = require('../models/todoModel')
 
 /** 
  * todo 조회
 */
-router.get('/todo', (req, res) => {
-  const { page = 1 } = req.query
+router.get('/todo', async (req, res) => {
+  const { page = 1 } = req.query;
 
-  selectTodoList({ page }).then((data) => {
-    const totalPage = data[0].totalPage
-    const result = data.map(v => {
-      delete v.totalPage
-      return {
-        ...v,
-        create_date: v.create_date.slice(0, 10)
-      }
-    });
+  const [completedList, todoList] = await Promise.all([
+    selectCompletedTodoList(),
+    selectTodoList({ page })
+  ])
 
-    res.send({
-      totalPage: Math.ceil(totalPage / 5),
-      list: result
-    })
-  }).catch((err) => {
-    console.log(err)
+  const completedTags = completedList.map((v) => v.id)
+
+  const list = todoList.map((v) => {
+    const tagList = []
+    if (v.tag) {
+      v.tag = v.tag.split(',')
+      v.tag.forEach((tag) => {
+        if (completedTags.includes(+tag)) {
+          tagList.push(tag)
+        }
+      })
+    } else {
+      v.tag = []
+    }
+
+    return {
+      ...v,
+      completedTags: tagList,
+      create_date: v.create_date.slice(0, 10)
+    }
+  })
+
+  res.send({
+    totalPage: Math.ceil(list[0].totalPage / 5),
+    list,
   })
 })
 
@@ -85,40 +99,45 @@ router.delete('/todo/:todoId', (req, res) => {
 })
 
 /** 
- * todo 수정
+ * todo 데이터 수정
 */
 router.put('/todo/:todoId', (req, res) => {
-  const { todo, page } = req.body;
+  const { todo, is_complete } = req.body;
   const { todoId } = req.params;
-  const date = new Date();
-  const month = date.getMonth() + 1
-  const editDate = `${date.getFullYear()}-${(month < 10 ? `0${month}` : month)}-${date.getDate()}`
+  const data = {};
+  if (todo) {
+    const date = new Date();
+    const month = date.getMonth() + 1
+    data.text = todo
+    data.edit_date = `${date.getFullYear()}-${(month < 10 ? `0${month}` : month)}-${date.getDate()}`
+  }
 
-  editTodoList({ todo, editDate, todoId }).then((data) => {
-    selectTodoList({ page }).then((data) => {
-      const totalPage = data[0].totalPage
-      const result = data.map(v => {
-        delete v.totalPage
-        return {
-          ...v,
-          create_date: v.create_date.slice(0, 10)
-        }
-      });
+  data.is_complete = is_complete === 'Y' ? true : false
 
-      res.send({
-        totalPage: Math.ceil(totalPage / 5),
-        list: result
-      })
+  editTodoList(todoId, data)
+    .then((data) => {
+      res.sendStatus(200)
     }).catch((err) => {
       console.log(err)
+    })
+})
+
+/** 
+ * 참조 리스트 조회
+*/
+router.get('/todo/tag', (req, res) => {
+  selectTagList().then((data) => {
+    res.send({
+      tagList: data
     })
   }).catch((err) => {
     console.log(err)
   })
 })
 
+
 /** 
- * 참조 리스트 조회
+ * 리스트 완료 처리
 */
 router.get('/todo/tag', (req, res) => {
   selectTagList().then((data) => {

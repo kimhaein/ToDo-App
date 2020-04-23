@@ -46,13 +46,6 @@ ul {
       margin: 5px 0px;
       font-size: 12px;
     }
-    .submitBtn {
-      width: 200px;
-      padding: 14px;
-      margin: 10px;
-      background-color: blue;
-      color:#fff
-    }
   }
   .todoListBox {
     height: 520px;
@@ -79,6 +72,13 @@ ul {
         > div {
           margin: 5px;
         }
+        .tagList {
+          color:red;
+          margin: 0px 2px;
+          &.complete {
+            color:blue
+          }
+        }
       }
       .btnBox {
         width: 80px;
@@ -93,20 +93,17 @@ ul {
           color:blue;
         }
       }
-      .complete {
+      .completeBox {
         position: absolute;
         top:50%;
-        left:50%;
-        margin-top: -30px;
-        margin-left: -60px;
-        padding: 10px;
+        left:80px;
+        margin-top: -25px;
+        padding: 5px;
         border: 8px solid blue;
         color: blue;
         background-color: #fff;
         font-size: 20px;
         font-weight: bold;
-
-
       }
     }
   }
@@ -126,6 +123,20 @@ ul {
         color: #fff;
       }
     }
+  }
+}
+
+.btn {
+  width: 200px;
+  padding: 14px;
+  margin: 10px;
+  background-color: blue;
+  color:#fff;
+  cursor: pointer;
+  &.download {
+    position: absolute;
+    top:0;
+    right:0;
   }
 }
 

@@ -43,9 +43,8 @@ function App() {
     if(todo) {
       const data = { todo: todo, page: crruntPage, tag:selectTagList.join(',') }
       axios.post('http://localhost:5000/api/todo', qs.stringify(data))
-      .then((result) => {
-        setTotalPage(result.data.totalPage)
-        setTodoList(result.data.list)
+      .then(() => {
+        getTodoList()
       }).catch((e) => {
         console.log(e)
       })
@@ -59,26 +58,26 @@ function App() {
     if (confirm) {
       const params = { page: crruntPage }
       axios.delete(`http://localhost:5000/api/todo/${todoId}`, { params })
-        .then((result) => {
-          setTotalPage(result.data.totalPage)
-          setTodoList(result.data.list)
+        .then(() => {
+          getTodoList()
         }).catch((e) => {
           console.log(e)
         })
       }
   }
 
-  const editTodoList = (todo,todoId) => {
-    if(todo){
-      const data = { todo, page: crruntPage }
+  const editTodoList = (todo, todoId, is_complete) => {
+    const data = {todo, todoId, is_complete}
+    if (todo || is_complete){ 
       axios.put(`http://localhost:5000/api/todo/${todoId}`, qs.stringify(data))
-        .then((result) => {
-          setTotalPage(result.data.totalPage)
-          setTodoList(result.data.list)
-        }).catch((e) => {
-          console.log(e)
-        })
+      .then(() => {
+        getTodoList()
+      }).catch((e) => {
+        console.log(e)
+      })
     }
+    
+
   }
 
   const getTagList = () => {
@@ -136,7 +135,26 @@ function App() {
             </select>
           </label>
           <p>* 다중 선택 : MAC  - Command + click | WINDOW  - Shift + click</p>
-          <div className="submitBtn" onClick={postTodoList}>ADD TODO</div>
+          <div className="btn" onClick={postTodoList}>ADD TODO</div>
+        </div>
+        <div>
+          <label>전체
+            <input type="radio" name="complete" defaultChecked={true}/>
+          </label>
+          <label>완료
+            <input type="radio" name="complete" defaultChecked={false}/>
+          </label>
+          <label>미완료
+            <input type="radio" name="complete" defaultChecked={false}/>
+          </label>
+          <label>오름차순
+            <input type="radio" name="order" value="DESC" defaultChecked={false}/>
+          </label>
+          <label>내림차순
+            <input type="radio" name="order" value="ASC" defaultChecked={false}/>
+          </label>
+          <input type="textBox" />
+          <div className="btn">검색</div>
         </div>
         <TodoList
           todoList={todoList}
@@ -148,6 +166,7 @@ function App() {
           {renderPagination()}
         </ul>
       </div>
+      <div className="btn download" onClick={()=>{console.log('다운로드')}}>다운로드</div>
     </div>
   );
 }
