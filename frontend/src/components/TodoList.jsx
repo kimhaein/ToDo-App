@@ -16,6 +16,7 @@ function TodoList({todoList, deleteTodoList, editTodoList}) {
           />
         )
       })}
+      { todoList.length <= 0 ?(<p>데이터가 없습니다.</p>): null }
     </div>
   )
 }

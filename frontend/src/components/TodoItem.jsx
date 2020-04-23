@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 function TodoItem({data, deleteTodoList, editTodoList}) {
   const [editTodoId, setEditTodoId] = useState(0)
-  const [todo, setTodo] = useState('')
+  const [text, setText] = useState('')
   const [isChecked, serIsChecked] = useState((data.is_complete === 'Y') ? true : false)
 
   const renderTodoText = (todo) => {
@@ -12,7 +12,7 @@ function TodoItem({data, deleteTodoList, editTodoList}) {
     })
 
     if(editTodoId === todo.id){
-      return <input type="text" defaultValue={todo.text} onChange={({target})=>{ setTodo(target.value)}}/>
+      return <input type="text" defaultValue={todo.text} onChange={({target})=>{ setText(target.value)}}/>
     }else {
       return (
         <>
@@ -26,7 +26,7 @@ function TodoItem({data, deleteTodoList, editTodoList}) {
 
   const renderEditBtn = (todo) => {
     if(editTodoId === todo.id){
-      return <span className="editBtn" onClick={() => { editTodoList(todo, todo.id ,todo.is_complete); setEditTodoId(0); setTodo('')}}>수정완료</span>
+      return <span className="editBtn" onClick={() => { editTodoList(text, todo.id ,todo.is_complete); setEditTodoId(0);}}>수정완료</span>
     }else {
       return (
         <>
@@ -44,7 +44,7 @@ function TodoItem({data, deleteTodoList, editTodoList}) {
       serIsChecked(false)
     }else {
       const is_complete = target.checked ? 'Y' : 'N'
-      editTodoList(todo, todoId, is_complete)
+      editTodoList(text, todoId, is_complete)
       serIsChecked(!isChecked)
     }
   }

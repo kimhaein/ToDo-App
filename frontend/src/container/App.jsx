@@ -11,6 +11,9 @@ function App() {
   const [todo, setTodo] = useState('')
   const [tagList, setTagList] = useState([])
   const [selectTagList, setSelectTagList] = useState([])
+  const [search, setSearch] = useState('')
+  const [todoOrder, setTodoOrder] = useState('DESC')
+  const [todoIsComplete, setTodoIsComplete] = useState('all')
 
   useEffect(() => {
     getTagList()
@@ -18,7 +21,8 @@ function App() {
 
   useEffect(() => {
     getTodoList()
-  }, [crruntPage])
+  }, [crruntPage, todoOrder, todoIsComplete])
+  
 
   useEffect(() => {
     if(totalPage === 0){
@@ -27,9 +31,8 @@ function App() {
   }, [totalPage])
   
 
-
   const getTodoList = () => {
-    const params = { page: crruntPage }
+    const params = { page: crruntPage, order: todoOrder, is_complete : todoIsComplete, search }
     axios.get(`http://localhost:5000/api/todo`, { params })
       .then((result) => {
         setTotalPage(result.data.totalPage)
@@ -45,6 +48,7 @@ function App() {
       axios.post('http://localhost:5000/api/todo', qs.stringify(data))
       .then(() => {
         getTodoList()
+        getTagList()
       }).catch((e) => {
         console.log(e)
       })
@@ -60,6 +64,7 @@ function App() {
       axios.delete(`http://localhost:5000/api/todo/${todoId}`, { params })
         .then(() => {
           getTodoList()
+          getTagList()
         }).catch((e) => {
           console.log(e)
         })
@@ -72,12 +77,11 @@ function App() {
       axios.put(`http://localhost:5000/api/todo/${todoId}`, qs.stringify(data))
       .then(() => {
         getTodoList()
+        getTagList()
       }).catch((e) => {
         console.log(e)
       })
     }
-    
-
   }
 
   const getTagList = () => {
@@ -99,6 +103,8 @@ function App() {
     }
     setSelectTagList(value)
   }
+
+
   
 
   const renderOption = ()=>{
@@ -133,39 +139,53 @@ function App() {
               {renderOption()}
             </select>
           </label>
-          <p>* 다중 선택 : MAC  - Command + click | WINDOW  - Shift + click</p>
+          <p className='notice'>* 다중 선택 : MAC  - Command + click | WINDOW  - Control + click</p>
           <div className="btn" onClick={postTodoList}>ADD TODO</div>
         </div>
-        <div>
-          <label>전체
-            <input type="radio" name="complete" defaultChecked={true}/>
-          </label>
-          <label>완료
-            <input type="radio" name="complete" defaultChecked={false}/>
-          </label>
-          <label>미완료
-            <input type="radio" name="complete" defaultChecked={false}/>
-          </label>
-          <label>오름차순
-            <input type="radio" name="order" value="DESC" defaultChecked={false}/>
-          </label>
-          <label>내림차순
-            <input type="radio" name="order" value="ASC" defaultChecked={false}/>
-          </label>
-          <input type="textBox" />
-          <div className="btn">검색</div>
+        <div className='searchBox'>
+          <div className='radioBox'>
+            <div>
+              <label>전체
+                <input type="radio" name="todoType" value="all" onChange={(e)=> {setTodoIsComplete(e.target.value)}} defaultChecked={true}/>
+              </label>
+              <label>완료
+                <input type="radio" name="todoType" value="true" onChange={(e)=> {
+                  setTodoIsComplete(e.target.value)
+                  setCrruntPage(1)
+                  }} defaultChecked={false}/>
+              </label>
+              <label>미완료
+                <input type="radio" name="todoType" value="false" onChange={(e)=> {
+                  setTodoIsComplete(e.target.value)
+                  setCrruntPage(1)
+                  }} defaultChecked={false}/>
+              </label>
+            </div>
+            <div>
+              <label>내림차순
+                <input type="radio" name="todoOrder" value="DESC" onChange={(e)=> {setTodoOrder(e.target.value)}} defaultChecked={true}/>
+              </label>
+              <label>오름차순
+                <input type="radio" name="todoOrder" value="ASC" onChange={(e)=> {setTodoOrder(e.target.value)}}defaultChecked={false}/>
+              </label>
+            </div>
+          </div>
+          <div>
+            <input type="text" onChange={(e)=>{setSearch(e.target.value)}}/>
+            <span className="btn" onClick={getTodoList}>검색</span>
+            <p className='notice'>내용,날짜 검색 가능 ( 날짜의 경우, 'YYYY-MM-DD'로 검색 )</p>
+          </div>
         </div>
         <TodoList
           todoList={todoList}
           deleteTodoList={deleteTodoList}
           editTodoList={editTodoList}
-          tagList={tagList}
         />
         <ul className="pagination">
           {renderPagination()}
         </ul>
       </div>
-      <a className="btn download" href="http://localhost:5000/api/todo/download" target="_blank">다운로드</a>
+      <a className="btn download" href={`http://localhost:5000/api/todo/download?page=all&order=${todoOrder}&is_complete=${todoIsComplete}&search=${search}`}  target="_blank" rel="noopener noreferrer">다운로드</a>
     </div>
   );
 }

@@ -11,10 +11,21 @@ const db = new sqlite3.Database('./db/todoApp.db', sqlite3.OPEN_READWRITE, (err)
 /** 
  * todo 조회
 */
-const selectTodoList = (page) => {
+const selectTodoList = ({ page, order, is_complete, search }) => {
+  let whereStatement = '';
+
+  if (is_complete !== 'all' && search) {
+    whereStatement = `WHERE is_complete = '${is_complete}' AND (text LIKE '%${search}%' OR create_date LIKE '%${search}%')`
+  } else if (is_complete !== 'all' && !search) {
+    whereStatement = `WHERE is_complete = '${is_complete}'`
+  } else if (is_complete === 'all' && search) {
+    whereStatement = `WHERE text LIKE '%${search}%' OR create_date LIKE '%${search}%'`
+  }
+
   const query = [
-    `SELECT (SELECT COUNT(*)  FROM todo) AS totalPage,`,
-    `id, text, tag, create_date, edit_date,`,
+    `SELECT (SELECT COUNT(*) FROM todo `,
+    `${whereStatement} ) AS totalPage,`,
+    `id, text, tag, create_date, edit_date, `,
     `CASE
         WHEN is_complete = 'true'
         THEN 'Y'
@@ -22,8 +33,9 @@ const selectTodoList = (page) => {
         THEN 'N'
       END AS is_complete`,
     `FROM todo`,
-    `ORDER BY id DESC`,
-    (page) ? `LIMIT ${5 * (page - 1)},5` : null
+    whereStatement,
+    `ORDER BY id ${order}`,
+    (page !== 'all') ? `LIMIT ${5 * (page - 1)}, 5` : null
   ].join(' ')
 
   return new Promise(function (resolve, reject) {
@@ -43,7 +55,7 @@ module.exports.selectTodoList = selectTodoList
  * todo 추가
 */
 const insertTodoList = ({ todo, tag }) => {
-  const query = `INSERT INTO todo (text , tag) VALUES ('${todo}','${tag}')`;
+  const query = `INSERT INTO todo(text, tag) VALUES('${todo}', '${tag}')`;
   return new Promise(function (resolve, reject) {
     db.all(query, (err, rows) => {
       if (err) {
@@ -86,7 +98,7 @@ const editTodoList = (todoId, data) => {
   const query = [
     `UPDATE todo`,
     `SET ${createFiled.join(',')}`,
-    `WHERE id='${todoId}';`,
+    `WHERE id = '${todoId}'; `,
     `UPDATE todo`
   ].join(' ')
 
@@ -122,27 +134,4 @@ const selectTagList = () => {
 
 module.exports.selectTagList = selectTagList
 
-
-/** 
- * 완료된 투두 조회
-*/
-const selectCompletedTodoList = () => {
-  const query = [
-    `SELECT id`,
-    `FROM todo`,
-    `WHERE is_complete == 'true'`
-  ].join(' ')
-
-  return new Promise(function (resolve, reject) {
-    db.all(query, (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-};
-
-module.exports.selectCompletedTodoList = selectCompletedTodoList
 

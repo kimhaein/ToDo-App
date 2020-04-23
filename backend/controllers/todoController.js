@@ -5,7 +5,6 @@ const {
   deleteTodoList,
   editTodoList,
   selectTagList,
-  selectCompletedTodoList
 } = require('../models/todoModel')
 
 
@@ -13,31 +12,43 @@ const {
  * todo 조회
 */
 router.get('/todo', async (req, res) => {
-  const { page = 1 } = req.query;
+  const { page = 1, order = 'DESC', is_complete = 'all', search } = req.query;
 
-  const [completedList, todoList] = await Promise.all([
-    selectCompletedTodoList(),
-    selectTodoList(page)
+  const [tagList, todoList] = await Promise.all([
+    selectTagList(),
+    selectTodoList({ page, order, is_complete, search })
   ])
 
-  const completedTags = completedList.map((v) => v.id)
+  if (search && todoList.length <= 0) {
+    res.send({ totalPage: 0, list: [] })
+  }
+
+  const tags = []
+  const completedTags = []
+
+  tagList.forEach((v) => {
+    tags.push(v.id)
+    if (v.is_complete === 'true') {
+      completedTags.push(v.id)
+    }
+  })
 
   const list = todoList.map((v) => {
-    const tagList = []
+    const completedTagArray = []
+    const tagArray = []
+
     if (v.tag) {
-      v.tag = v.tag.split('-')
-      v.tag.forEach((tag) => {
-        if (completedTags.includes(+tag)) {
-          tagList.push(tag)
-        }
+      v.tag.split('-').forEach((tag) => {
+        if (completedTags.includes(+tag)) { completedTagArray.push(tag) }
+        if (tags.includes(+tag)) { tagArray.push(tag) }
       })
-    } else {
-      v.tag = []
     }
+
+    v.tag = tagArray
 
     return {
       ...v,
-      completedTags: tagList,
+      completedTags: completedTagArray,
       create_date: v.create_date.slice(0, 10)
     }
   })
@@ -117,7 +128,9 @@ router.get('/todo/tag', (req, res) => {
  * todo 다운로드
 */
 router.get('/todo/download', (req, res) => {
-  selectTodoList()
+  const { page = 'all', order = 'DESC', is_complete = 'all', search } = req.query;
+
+  selectTodoList({ page, order, is_complete, search })
     .then((data) => {
       const csvArray = ['id, text, tag, create_date, edit_date, is_complete'];
       data.map((v) => {

@@ -42,9 +42,20 @@ ul {
         width: 226px;
       }
     }
-    p {
-      margin: 5px 0px;
-      font-size: 12px;
+  }
+  .searchBox {
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    justify-content: center;
+    margin: 10px 0px;
+    .radioBox {
+      > div {
+        margin: 10px;
+        label {
+          margin: 0px 5px
+        }
+      }
     }
   }
   .todoListBox {
@@ -107,23 +118,11 @@ ul {
       }
     }
   }
+}
 
-  .pagination {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 20px auto;
-    li {
-      padding: 5px 10px;
-      margin: 0px 5px;
-      border-radius: 10px;
-      cursor: pointer;
-      &.active {
-        background-color: blue;
-        color: #fff;
-      }
-    }
-  }
+.notice {
+  margin: 5px 0px;
+  font-size: 12px;
 }
 
 .btn {
@@ -137,6 +136,23 @@ ul {
     position: absolute;
     top:0;
     right:0;
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px auto;
+  li {
+    padding: 5px 10px;
+    margin: 0px 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    &.active {
+      background-color: blue;
+      color: #fff;
+    }
   }
 }
 
