@@ -63,7 +63,7 @@ router.get('/todo', async (req, res) => {
  * todo 추가
 */
 router.post('/todo', (req, res) => {
-  const { todo = [], tag = '', page = 1 } = req.body
+  const { todo = [], tag = '' } = req.body
   insertTodoList({ todo, tag })
     .then(() => {
       res.sendStatus(200)
@@ -76,7 +76,6 @@ router.post('/todo', (req, res) => {
  * todo 삭제
 */
 router.delete('/todo/:todoId', (req, res) => {
-  const { page } = req.query;
   const { todoId } = req.params;
   deleteTodoList({ todoId })
     .then(() => {

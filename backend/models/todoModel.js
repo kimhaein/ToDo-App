@@ -10,10 +10,13 @@ const db = new sqlite3.Database('./db/todoApp.db', sqlite3.OPEN_READWRITE, (err)
 
 /** 
  * todo 조회
+ * @param page 현재 페이지
+ * @param order 정렬
+ * @param is_complete 완료여부
+ * @param search 검색키워드
 */
 const selectTodoList = ({ page, order, is_complete, search }) => {
   let whereStatement = '';
-
   if (is_complete !== 'all' && search) {
     whereStatement = `WHERE is_complete = '${is_complete}' AND (text LIKE '%${search}%' OR create_date LIKE '${search}%')`
   } else if (is_complete !== 'all' && !search) {
@@ -53,6 +56,8 @@ module.exports.selectTodoList = selectTodoList
 
 /** 
  * todo 추가
+ * @param todo 투두 내용
+ * @param tag 참조 리스트 아이디
 */
 const insertTodoList = ({ todo, tag }) => {
   const query = `INSERT INTO todo(text, tag) VALUES('${todo}', '${tag}')`;
@@ -71,6 +76,7 @@ module.exports.insertTodoList = insertTodoList
 
 /** 
  * todo 삭제
+ * @param todoId 투두 아이디
 */
 const deleteTodoList = ({ todoId }) => {
   const query = `DELETE FROM todo WHERE id = '${todoId}'`;
@@ -88,7 +94,9 @@ const deleteTodoList = ({ todoId }) => {
 module.exports.deleteTodoList = deleteTodoList
 
 /** 
- * todo 삭제
+ * todo 수정
+ * @param todoId 투두 아이디
+ * @param data 수정할 데이터
 */
 const editTodoList = (todoId, data) => {
   const createFiled = Object.keys(data).map((v) => {
