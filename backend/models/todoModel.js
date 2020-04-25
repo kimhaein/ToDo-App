@@ -15,11 +15,11 @@ const selectTodoList = ({ page, order, is_complete, search }) => {
   let whereStatement = '';
 
   if (is_complete !== 'all' && search) {
-    whereStatement = `WHERE is_complete = '${is_complete}' AND (text LIKE '%${search}%' OR create_date LIKE '%${search}%')`
+    whereStatement = `WHERE is_complete = '${is_complete}' AND (text LIKE '%${search}%' OR create_date LIKE '${search}%')`
   } else if (is_complete !== 'all' && !search) {
     whereStatement = `WHERE is_complete = '${is_complete}'`
   } else if (is_complete === 'all' && search) {
-    whereStatement = `WHERE text LIKE '%${search}%' OR create_date LIKE '%${search}%'`
+    whereStatement = `WHERE text LIKE '%${search}%' OR create_date LIKE '${search}%'`
   }
 
   const query = [
