@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import qs from 'qs';
 import TodoList from '../components/TodoList'
+import RadioList from '../components/RadioList'
 import '../style/style.scss';
 
 function App() {
@@ -144,31 +145,20 @@ function App() {
         </div>
         <div className='searchBox'>
           <div className='radioBox'>
-            <div>
-              <label>전체
-                <input type="radio" name="todoType" value="all" onChange={(e)=> {setTodoIsComplete(e.target.value)}} defaultChecked={true}/>
-              </label>
-              <label>완료
-                <input type="radio" name="todoType" value="true" onChange={(e)=> {
-                  setTodoIsComplete(e.target.value)
-                  setCrruntPage(1)
-                  }} defaultChecked={false}/>
-              </label>
-              <label>미완료
-                <input type="radio" name="todoType" value="false" onChange={(e)=> {
-                  setTodoIsComplete(e.target.value)
-                  setCrruntPage(1)
-                  }} defaultChecked={false}/>
-              </label>
-            </div>
-            <div>
-              <label>내림차순
-                <input type="radio" name="todoOrder" value="DESC" onChange={(e)=> {setTodoOrder(e.target.value)}} defaultChecked={true}/>
-              </label>
-              <label>오름차순
-                <input type="radio" name="todoOrder" value="ASC" onChange={(e)=> {setTodoOrder(e.target.value)}}defaultChecked={false}/>
-              </label>
-            </div>
+            <RadioList
+              item={[{title:'전체',value:'all'},{title:'완료',value:'true'},{title:'미완료',value:'false'}]}
+              active={'all'}
+              name={'todoType'}
+              onEvent={setTodoIsComplete}
+              setCrruntPage={setCrruntPage}
+            />
+            <RadioList
+              item={[{title:'내림차순',value:'DESC'},{title:'오름차순',value:'ASC'}]}
+              active={'DESC'}
+              name={'todoOrder'}
+              onEvent={setTodoOrder}
+              setCrruntPage={setCrruntPage}
+            />
           </div>
           <div>
             <input type="text" onChange={(e)=>{setSearch(e.target.value)}}/>
