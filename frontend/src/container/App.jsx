@@ -175,7 +175,7 @@ function App() {
           {renderPagination()}
         </ul>
       </div>
-      <a className="btn download" href={`http://localhost:5000/api/todo/download?page=all&order=${todoOrder}&is_complete=${todoIsComplete}&search=${search}`}  target="_blank" rel="noopener noreferrer">다운로드</a>
+      {todoList.length > 0 ? <a className="btn download" href={`http://localhost:5000/api/todo/download?page=all&order=${todoOrder}&is_complete=${todoIsComplete}&search=${search}`}  target="_blank" rel="noopener noreferrer">다운로드</a>:null}
     </div>
   );
 }

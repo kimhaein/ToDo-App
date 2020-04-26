@@ -4,9 +4,9 @@ function RadioList({item, active, name, onEvent, setCrruntPage}) {
   const [activeVal, setActiveVal] = useState(active)
   return (
     <div className="radioBox">
-      {item.map((v) => {
+      {item.map((v,i) => {
         return (
-          <label>
+          <label key={`radio-${i}`}>
             {v.title}
             <input 
               type="radio" 

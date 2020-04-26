@@ -22,4 +22,4 @@ app.all('*', (req, res, next) => {
 // 라우터
 app.use('/api', todoController)
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`))
+app.listen(port, () => console.log(`start http://localhost:${port}`))
